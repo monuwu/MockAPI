@@ -1,6 +1,4 @@
 // Vercel serverless function to proxy MockAPI requests
-import axios from 'axios';
-
 const MOCKAPI_URL = 'https://695b621b1d8041d5eeb69275.mockapi.io/api/202/users';
 
 export default async function handler(req, res) {
@@ -25,36 +23,30 @@ export default async function handler(req, res) {
       apiUrl = `${MOCKAPI_URL}/${id}`;
     }
 
-    let response;
-    
-    switch (req.method) {
-      case 'GET':
-        response = await axios.get(apiUrl);
-        break;
-      
-      case 'POST':
-        response = await axios.post(apiUrl, req.body);
-        break;
-      
-      case 'PUT':
-        response = await axios.put(apiUrl, req.body);
-        break;
-      
-      case 'DELETE':
-        response = await axios.delete(apiUrl);
-        break;
-      
-      default:
-        res.status(405).json({ error: 'Method not allowed' });
-        return;
+    const options = {
+      method: req.method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    // Add body for POST and PUT requests
+    if (req.method === 'POST' || req.method === 'PUT') {
+      options.body = JSON.stringify(req.body);
     }
 
-    res.status(200).json(response.data);
+    const response = await fetch(apiUrl, options);
+    
+    if (!response.ok) {
+      throw new Error(`MockAPI returned ${response.status}`);
+    }
+
+    const data = await response.json();
+    res.status(200).json(data);
   } catch (error) {
     console.error('Proxy error:', error.message);
-    res.status(error.response?.status || 500).json({
-      error: error.message,
-      details: error.response?.data
+    res.status(500).json({
+      error: error.message
     });
   }
 }
