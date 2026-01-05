@@ -5,10 +5,13 @@ import { Container, Typography, TextField, Button, List, ListItem, ListItemText,
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
+import ChildCareIcon from '@mui/icons-material/ChildCare';
 import { useSnackbar } from 'notistack';
 import { Skeleton } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 function App() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const {enqueueSnackbar} = useSnackbar();
   const [users, setUsers] = useState([]);
@@ -183,6 +186,12 @@ function App() {
                     </>
                   ) : (
                     <>
+                      <IconButton edge="end" aria-label="child" color="primary" onClick={() => {
+                        localStorage.setItem(`user_${user.id}`, JSON.stringify(user));
+                        navigate(`/child/${user.id}`);
+                      }}>
+                        <ChildCareIcon />
+                      </IconButton>
                       <IconButton edge="end" aria-label="edit" onClick={() => startEdit(user)}>
                         <EditIcon />
                       </IconButton>
@@ -205,7 +214,7 @@ function App() {
                       </ListItemAvatar>
                       <ListItemText 
                         primary={user.name} 
-                        secondary={user.nameParts ? user.nameParts.filter(Boolean).join(' • ') : null}
+                        secondary={user.child ? user.child.filter(Boolean).join(' • ') : null}
                       />
                     </>
                   )}
