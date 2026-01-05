@@ -1,9 +1,9 @@
 // Vercel serverless function to proxy MockAPI requests
-const axios = require('axios');
+import axios from 'axios';
 
 const MOCKAPI_URL = 'https://695b621b1d8041d5eeb69275.mockapi.io/api/202/users';
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -57,4 +57,4 @@ module.exports = async (req, res) => {
       details: error.response?.data
     });
   }
-};
+}
