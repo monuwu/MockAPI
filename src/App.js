@@ -26,11 +26,14 @@ function App() {
 
 
 // Fetch users
-  const MOCKAPI_URL = 'https://695b621b1d8041d5eeb69275.mockapi.io/api/202/users';
+  const API_URL = process.env.NODE_ENV === 'production' 
+    ? '/api/users' 
+    : 'http://localhost:3000/api/users';
+  
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-        const res = await axios.get(MOCKAPI_URL);
+        const res = await axios.get(API_URL);
         setUsers(res.data);
     } catch (error) {
       console.error('Error fetching users:', error.response?.data || error.message);
@@ -55,7 +58,7 @@ function App() {
       return;
     }
     try {
-      await axios.post(MOCKAPI_URL, { name });
+      await axios.post(API_URL, { name });
       setName('');
       fetchUsers();
       enqueueSnackbar('User created successfully!', { variant: 'success' });
@@ -75,7 +78,7 @@ function App() {
   const handleUpdate = async (id) => {
     if (!editingName.trim()) return;
     try {
-      await axios.put(`${MOCKAPI_URL}/${id}`, { name: editingName });
+      await axios.put(`${API_URL}?id=${id}`, { name: editingName });
       setEditingId(null);
       setEditingName('');
       fetchUsers();
@@ -96,7 +99,7 @@ function App() {
   const confirmDelete = async () => {
     if (userToDelete) {
       try {
-        await axios.delete(`${MOCKAPI_URL}/${userToDelete.id}`);
+        await axios.delete(`${API_URL}?id=${userToDelete.id}`);
         setUserToDelete(null);
         setDeleteDialogOpen(false);
         fetchUsers();
